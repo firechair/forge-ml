@@ -1,35 +1,8 @@
 # 🚀 ForgeML Quick Start Guide
 
-Get up and running with ForgeML in minutes!
+Get up and running with ForgeML in minutes! This tutorial walks you through creating, training, and deploying your first ML project.
 
-## Prerequisites
-
-- Python 3.10 or higher
-- pip (Python package manager)
-- Docker (optional, for MLflow tracking server)
-
----
-
-## Installation
-
-### 1. Install ForgeML
-
-```bash
-# Clone the repository
-git clone https://github.com/firechair/forge-ml.git
-cd forge-ml
-
-# Install the package
-pip install -e .
-```
-
-### 2. Verify Installation
-
-```bash
-mlfactory --help
-```
-
-You should see the available commands.
+**→ For installation instructions, see the [Installation Guide](installation.md)**
 
 ---
 
@@ -64,20 +37,7 @@ my-sentiment-project/
 pip install -r requirements.txt
 ```
 
----
-
-## Start MLflow (Optional but Recommended)
-
-MLflow helps you track experiments and manage models.
-
-```bash
-# From the forge-ml directory
-cd ../infra
-docker-compose up -d
-
-# Check it's running
-open http://localhost:5000
-```
+**→ For MLflow setup (recommended for experiment tracking), see the [Installation Guide](installation.md#mlflow-infrastructure)**
 
 ---
 
@@ -270,50 +230,14 @@ mlfactory init time_series --name my-forecasting-project
 
 ---
 
-## Troubleshooting
-
-### Import Errors
-
-```bash
-# Make sure all dependencies are installed
-pip install -r requirements.txt
-```
-
-### CUDA Out of Memory
-
-Edit `config.yaml`:
-```yaml
-training:
-  batch_size: 8  # Reduce from 16
-```
-
-### MLflow Connection Issues
-
-```bash
-# Check if MLflow is running
-curl http://localhost:5000
-
-# Or use local file tracking
-# Edit config.yaml:
-mlflow:
-  tracking_uri: "file:./mlruns"
-```
-
-### Port Already in Use
-
-```bash
-# Use a different port
-mlfactory serve --port 8001
-```
-
----
-
 ## Getting Help
 
-- **Documentation**: Check `README.md` in your project
-- **Examples**: Look in `examples/` directory
-- **Issues**: Open an issue on GitHub
-- **Discussions**: Join GitHub Discussions
+**→ For troubleshooting common issues, see the [FAQ](faq.md)**
+
+- **CLI Reference**: [Full command documentation](cli-reference.md)
+- **Examples**: Look in the `examples/` directory
+- **Issues**: [GitHub Issues](https://github.com/firechair/forge-ml/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/firechair/forge-ml/discussions)
 
 ---
 

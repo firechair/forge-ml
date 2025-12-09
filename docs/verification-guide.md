@@ -26,53 +26,16 @@ docker-compose --version
 
 ## Installation Test
 
-### Option 1: Automated Setup (Recommended)
+**→ First, complete the installation by following the [Installation Guide](installation.md)**
+
+After installation, verify it worked:
 
 ```bash
-# Clone the repository
-git clone https://github.com/firechair/forge-ml.git
-cd forge-ml
-
-# Run setup script
-# On Linux/Mac:
-./scripts/setup.sh
-
-# On Windows PowerShell:
-.\scripts\setup.ps1
-```
-
-**Expected Output:**
-- ✅ Python version check passes
-- ✅ Virtual environment created
-- ✅ Dependencies installed
-- ✅ Pre-commit hooks installed
-- ✅ Docker infrastructure started
-- ✅ Verification tests pass
-
-### Option 2: Manual Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/firechair/forge-ml.git
-cd forge-ml
-
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# Linux/Mac:
-source venv/bin/activate
-# Windows:
-venv\Scripts\activate
-
-# Install ForgeML
-pip install -e .
-
-# Verify installation
+# Verify ForgeML CLI is available
 mlfactory --help
 ```
 
-**Expected Output:** Help message showing available commands
+**Expected Output:** Help message showing available commands (init, train, serve)
 
 ---
 
@@ -221,28 +184,20 @@ rm -rf test-timeseries
 
 ## MLflow UI Test
 
-If Docker is running, verify MLflow UI:
+**→ To set up MLflow, see [Installation Guide - MLflow Infrastructure](installation.md#mlflow-infrastructure)**
+
+After starting MLflow, verify it's accessible:
 
 ```bash
-# Start MLflow infrastructure
-cd forge-ml/infra
-docker-compose up -d
-
-# Wait for startup
-sleep 10
-
 # Check MLflow is accessible
-curl http://localhost:5000
+curl http://localhost:5000/health
 
 # Open in browser
-open http://localhost:5000  # Mac
-# or
-xdg-open http://localhost:5000  # Linux
-# or
-start http://localhost:5000  # Windows
+open http://localhost:5000  # Mac/Linux
+# or visit http://localhost:5000 in your browser
 ```
 
-**Expected:** MLflow UI loads showing experiments
+**Expected:** MLflow UI loads showing experiments dashboard
 
 ---
 

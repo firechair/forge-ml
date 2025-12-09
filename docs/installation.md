@@ -132,12 +132,70 @@ PyTorch automatically uses Metal - no extra steps needed!
 # Install Docker Desktop
 # Download from: https://www.docker.com/products/docker-desktop/
 
-# Start MLflow
+# Verify Docker is running
+docker --version
+docker ps
+```
+
+## MLflow Infrastructure
+
+MLflow provides experiment tracking, model registry, and visualization for your ML projects.
+
+### Local MLflow Server (Single User)
+
+```bash
+# From the forge-ml root directory
 cd infra
 docker-compose up -d
 
-# Verify
+# Verify it's running
 curl http://localhost:5000/health
+# Or open in browser
+open http://localhost:5000
+```
+
+**What this provides:**
+- MLflow UI at `http://localhost:5000`
+- Experiment tracking for all your projects
+- Model registry
+- Metric visualization
+
+### Stop MLflow
+
+```bash
+cd infra
+docker-compose down
+```
+
+### Team MLflow Server (Multi-User)
+
+For team collaboration with persistent storage:
+
+```bash
+cd infra
+docker-compose -f docker-compose-team.yml up -d
+```
+
+This uses PostgreSQL as the backend store for better performance and multi-user support.
+
+**→ For team setup details, see the [Team Collaboration Guide](team-collaboration.md)**
+
+### Using MLflow in Your Projects
+
+Your generated projects are pre-configured to use MLflow. The `config.yaml` file contains:
+
+```yaml
+mlflow:
+  tracking_uri: "http://localhost:5000"  # Points to local server
+  experiment_name: "my-project"
+```
+
+**Alternative: File-based tracking (no Docker needed)**
+
+Edit your project's `config.yaml`:
+```yaml
+mlflow:
+  tracking_uri: "file:./mlruns"  # Local directory instead of server
 ```
 
 ## Development Install

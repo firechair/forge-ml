@@ -6,7 +6,7 @@
 A: A CLI tool that creates production-ready ML project templates with MLflow, DVC, Docker, and FastAPI pre-configured.
 
 **Q: Is it free?**
-A: Yes, ForgeML is open-source (MIT License).
+A: Yes for personal, educational, and research use. See the [LICENSE](../LICENSE) for details. Commercial use requires separate licensing.
 
 **Q: What ML frameworks does it support?**
 A: Currently PyTorch with HuggingFace Transformers. TensorFlow support planned.
@@ -200,6 +200,54 @@ A: Ensure you've trained a model first:
 python train.py
 # Then run tests
 pytest tests/
+```
+
+**Q: Import errors when running train.py?**
+A: Make sure all project dependencies are installed:
+```bash
+pip install -r requirements.txt
+```
+
+**Q: CUDA out of memory error?**
+A: Reduce batch size in your project's `config.yaml`:
+```yaml
+training:
+  batch_size: 8  # Reduce from 16 or 32
+```
+
+**Q: Can't connect to MLflow server?**
+A: Check if MLflow is running:
+```bash
+# Check Docker containers
+docker ps
+
+# Or verify MLflow is accessible
+curl http://localhost:5000
+
+# Alternative: Use local file tracking
+# Edit config.yaml:
+mlflow:
+  tracking_uri: "file:./mlruns"
+```
+
+**Q: Port already in use (8000)?**
+A: Use a different port:
+```bash
+mlfactory serve --port 8001
+```
+
+**Q: SSL certificate errors during pip install?**
+A: Use trusted hosts flag:
+```bash
+pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
+```
+
+**Q: Permission denied errors on Linux/Mac?**
+A: Don't use sudo with pip. Use virtual environments instead:
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## Performance

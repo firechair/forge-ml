@@ -89,7 +89,7 @@ forge-ml/
 - **Well Tested**: 33+ test functions across templates
 - **Comprehensive Docs**: 2,800+ lines of documentation
 - **Team Ready**: Shared infrastructure and collaboration guides
-- **Open Source**: MIT License
+- **Open Source**: Custom non-commercial license (free for personal/educational use)
 
 ### 🔧 Technical Details
 

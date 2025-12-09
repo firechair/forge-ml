@@ -376,7 +376,7 @@ Once training is complete:
 
 ## 📄 License
 
-This project template is part of ForgeML and is licensed under the MIT License.
+This project template is part of ForgeML and is licensed under a custom non-commercial license. See the main [LICENSE](../../LICENSE) file for details.
 
 ---
 
