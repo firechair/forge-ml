@@ -51,6 +51,7 @@ python serve.py
 
 - **[Installation Guide](docs/installation.md)** - Complete setup instructions for all platforms
 - **[Quick Start Tutorial](docs/quickstart.md)** - Step-by-step first project guide
+- **[Architecture Documentation](docs/architecture.md)** - System design and component architecture
 - **[CLI Reference](docs/cli-reference.md)** - Full command documentation
 - **[FAQ](docs/faq.md)** - Common questions and troubleshooting
 - **[Team Collaboration](docs/team-collaboration.md)** - Shared workflows and infrastructure
