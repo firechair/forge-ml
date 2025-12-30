@@ -10,8 +10,6 @@ import subprocess
 import tempfile
 import shutil
 from pathlib import Path
-import time
-import requests
 import sys
 
 
@@ -90,7 +88,15 @@ def test_init_existing_directory(forgeml_root):
 
         # Try to init into existing directory
         result = subprocess.run(
-            [sys.executable, "-m", "cli.main", "init", "sentiment", "--name", project_name],
+            [
+                sys.executable,
+                "-m",
+                "cli.main",
+                "init",
+                "sentiment",
+                "--name",
+                project_name,
+            ],
             cwd=forgeml_root,
             capture_output=True,
             text=True,
@@ -117,7 +123,15 @@ def test_full_workflow_quick_train(forgeml_root):
     try:
         # 1. Create project
         result = subprocess.run(
-            [sys.executable, "-m", "cli.main", "init", "sentiment", "--name", project_name],
+            [
+                sys.executable,
+                "-m",
+                "cli.main",
+                "init",
+                "sentiment",
+                "--name",
+                project_name,
+            ],
             cwd=forgeml_root,
             capture_output=True,
             text=True,
@@ -165,7 +179,7 @@ def test_full_workflow_quick_train(forgeml_root):
         with open(serve_script) as f:
             compile(f.read(), serve_script, "exec")
 
-        print(f"✅ Full workflow test passed (quick version)")
+        print("✅ Full workflow test passed (quick version)")
 
     finally:
         # Cleanup
@@ -203,9 +217,7 @@ def test_serve_command_validation(forgeml_root):
 
         # Should fail because serve.py doesn't exist
         assert result.returncode == 1
-        assert (
-            "serve.py" in result.stdout.lower() or "not found" in result.stdout.lower()
-        )
+        assert "serve.py" in result.stdout.lower() or "not found" in result.stdout.lower()
 
 
 def test_cli_help_command(forgeml_root):
@@ -291,19 +303,15 @@ def test_template_requirements_are_valid(forgeml_root):
 
         # Check that file is not empty
         content = req_file.read_text()
-        assert (
-            len(content.strip()) > 0
-        ), f"Empty requirements.txt in {template_dir.name}"
+        assert len(content.strip()) > 0, f"Empty requirements.txt in {template_dir.name}"
 
         # Check for basic package format (very basic validation)
         lines = [
-            l.strip()
-            for l in content.split("\n")
-            if l.strip() and not l.startswith("#")
+            line.strip()
+            for line in content.split("\n")
+            if line.strip() and not line.startswith("#")
         ]
-        assert (
-            len(lines) > 0
-        ), f"No packages in requirements.txt for {template_dir.name}"
+        assert len(lines) > 0, f"No packages in requirements.txt for {template_dir.name}"
 
 
 def test_template_config_is_valid_yaml(forgeml_root):
@@ -337,7 +345,15 @@ def test_mlflow_uri_loading(forgeml_root):
     try:
         # Create project
         subprocess.run(
-            [sys.executable, "-m", "cli.main", "init", "sentiment", "--name", project_name],
+            [
+                sys.executable,
+                "-m",
+                "cli.main",
+                "init",
+                "sentiment",
+                "--name",
+                project_name,
+            ],
             cwd=forgeml_root,
             capture_output=True,
             text=True,

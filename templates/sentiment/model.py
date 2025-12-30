@@ -49,10 +49,8 @@ class SentimentClassifier:
 
         # Load tokenizer and model
         self.tokenizer: PreTrainedTokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model: PreTrainedModel = (
-            AutoModelForSequenceClassification.from_pretrained(
-                model_name, num_labels=num_labels
-            )
+        self.model: PreTrainedModel = AutoModelForSequenceClassification.from_pretrained(
+            model_name, num_labels=num_labels
         )
         self.model.to(self.device)
 

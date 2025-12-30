@@ -29,11 +29,11 @@ def check_python_version():
 
 def check_imports():
     """Check core dependencies can be imported."""
-    import torch
-    import yaml
-    import mlflow
-    import typer
-    import fastapi
+    import torch  # noqa: F401
+    import yaml  # noqa: F401
+    import mlflow  # noqa: F401
+    import typer  # noqa: F401
+    import fastapi  # noqa: F401
 
 
 def check_cli():
@@ -61,12 +61,10 @@ def check_templates():
 def check_docker():
     """Check if Docker is running (optional)."""
     try:
-        result = subprocess.run(
-            ["docker", "ps"], capture_output=True, text=True, timeout=5
-        )
+        result = subprocess.run(["docker", "ps"], capture_output=True, text=True, timeout=5)
         if result.returncode == 0:
             return True
-    except:
+    except Exception:
         pass
     return False
 

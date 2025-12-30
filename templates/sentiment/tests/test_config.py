@@ -4,9 +4,7 @@ Tests for configuration validation.
 Ensures the config.yaml file is properly formatted and contains valid values.
 """
 
-import pytest
 from pathlib import Path
-import yaml
 
 
 def test_config_file_exists():

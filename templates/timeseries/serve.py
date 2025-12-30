@@ -30,7 +30,7 @@ if not MODEL_PATH.exists():
 print(f"Loading model from {MODEL_PATH}...")
 forecaster = TimeSeriesForecaster.load(MODEL_PATH)
 model_info = forecaster.get_model_info()
-print(f"Model loaded successfully!")
+print("Model loaded successfully!")
 print(f"  Input size: {model_info['input_size']}")
 print(f"  Sequence length: {model_info['sequence_length']}")
 print(f"  Prediction length: {model_info['prediction_length']}")
@@ -42,7 +42,10 @@ class ForecastRequest(BaseModel):
 
     sequence: List[List[float]] = Field(
         ...,
-        description=f"Input sequence of shape ({model_info['sequence_length']}, {model_info['input_size']})",
+        description=(
+            f"Input sequence of shape "
+            f"({model_info['sequence_length']}, {model_info['input_size']})"
+        ),
     )
     normalize: bool = Field(
         default=True, description="Whether to normalize input (recommended: True)"
@@ -165,7 +168,10 @@ async def forecast_batch(request: BatchForecastRequest):
             if seq.shape != expected_shape:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid shape for sequence {i}. Expected {expected_shape}, got {seq.shape}",
+                    detail=(
+                        f"Invalid shape for sequence {i}. "
+                        f"Expected {expected_shape}, got {seq.shape}"
+                    ),
                 )
 
         # Make predictions
@@ -191,9 +197,7 @@ async def forecast_batch(request: BatchForecastRequest):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Batch prediction failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Batch prediction failed: {str(e)}")
 
 
 if __name__ == "__main__":

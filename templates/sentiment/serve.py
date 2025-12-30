@@ -6,8 +6,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any
-import mlflow
-import mlflow.pytorch
 from pathlib import Path
 import logging
 
@@ -31,9 +29,7 @@ model: Optional[SentimentClassifier] = None
 class PredictionRequest(BaseModel):
     """Request model for predictions."""
 
-    text: str = Field(
-        ..., description="Text to classify", min_length=1, max_length=10000
-    )
+    text: str = Field(..., description="Text to classify", min_length=1, max_length=10000)
 
     @validator("text")
     def text_not_empty(cls, v):
@@ -221,9 +217,7 @@ async def predict_batch(request: BatchPredictionRequest):
         return BatchPredictionResponse(predictions=predictions, count=len(predictions))
     except Exception as e:
         logger.error(f"Batch prediction error: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Batch prediction failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Batch prediction failed: {str(e)}")
 
 
 @app.get("/model/info", response_model=Dict[str, Any])

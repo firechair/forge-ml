@@ -2,10 +2,8 @@
 Training script for sentiment analysis model with MLflow tracking.
 """
 
-import os
 import yaml
 import argparse
-from pathlib import Path
 from typing import Dict, Any
 import random
 import numpy as np
@@ -98,9 +96,7 @@ def create_dataloader(dataset, classifier, batch_size: int, shuffle: bool = True
             "labels": labels,
         }
 
-    return DataLoader(
-        dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn
-    )
+    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn)
 
 
 def train_epoch(
@@ -127,9 +123,7 @@ def train_epoch(
         labels = batch["labels"].to(device)
 
         # Forward pass
-        outputs = model.model(
-            input_ids=input_ids, attention_mask=attention_mask, labels=labels
-        )
+        outputs = model.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
 
         loss = outputs.loss
         total_loss += loss.item()
@@ -138,9 +132,7 @@ def train_epoch(
         loss.backward()
 
         # Gradient accumulation
-        if (batch_idx + 1) % config["training"].get(
-            "gradient_accumulation_steps", 1
-        ) == 0:
+        if (batch_idx + 1) % config["training"].get("gradient_accumulation_steps", 1) == 0:
             optimizer.step()
             scheduler.step()
             optimizer.zero_grad()
@@ -187,9 +179,7 @@ def evaluate(model, dataloader, device: str) -> Dict[str, float]:
             attention_mask = batch["attention_mask"].to(device)
             labels = batch["labels"].to(device)
 
-            outputs = model.model(
-                input_ids=input_ids, attention_mask=attention_mask, labels=labels
-            )
+            outputs = model.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
 
             total_loss += outputs.loss.item()
             preds = torch.argmax(outputs.logits, dim=-1)
@@ -330,7 +320,7 @@ def main(config_path: str = "config.yaml", experiment_name: str = None):
                 mlflow.log_metric(f"train_{key}", value, step=epoch)
 
             # Evaluate
-            print(f"\nEvaluating on test set...")
+            print("\nEvaluating on test set...")
             test_metrics = evaluate(classifier, test_loader, classifier.device)
 
             print(f"Epoch {epoch + 1} Test Metrics:")
@@ -355,9 +345,9 @@ def main(config_path: str = "config.yaml", experiment_name: str = None):
         # Log final best score
         mlflow.log_metric("best_f1_score", best_f1)
 
-        print(f"\n✅ Training complete!")
+        print("\n✅ Training complete!")
         print(f"Best F1 Score: {best_f1:.4f}")
-        print(f"Model saved to: best_model/")
+        print("Model saved to: best_model/")
         print(f"MLflow Run ID: {mlflow.active_run().info.run_id}")
         print(f"View results at: {mlflow_config['tracking_uri']}")
 
@@ -367,9 +357,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--config", type=str, default="config.yaml", help="Path to configuration file"
     )
-    parser.add_argument(
-        "--experiment", type=str, default=None, help="MLflow experiment name"
-    )
+    parser.add_argument("--experiment", type=str, default=None, help="MLflow experiment name")
 
     args = parser.parse_args()
     main(args.config, args.experiment)

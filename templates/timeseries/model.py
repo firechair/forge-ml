@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List
 import json
 
 
@@ -84,9 +84,7 @@ class TimeSeriesLSTM(nn.Module):
 
         # Reshape to (batch_size, prediction_length, input_size)
         batch_size = x.size(0)
-        predictions = predictions.view(
-            batch_size, self.prediction_length, self.input_size
-        )
+        predictions = predictions.view(batch_size, self.prediction_length, self.input_size)
 
         return predictions
 
@@ -130,9 +128,7 @@ class TimeSeriesForecaster:
     def get_model_info(self) -> Dict:
         """Get model information."""
         num_params = sum(p.numel() for p in self.model.parameters())
-        trainable_params = sum(
-            p.numel() for p in self.model.parameters() if p.requires_grad
-        )
+        trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
 
         return {
             "input_size": self.input_size,
@@ -200,9 +196,7 @@ class TimeSeriesForecaster:
             "input_sequence": sequence.tolist(),
         }
 
-    def predict_batch(
-        self, sequences: List[np.ndarray], normalize: bool = True
-    ) -> List[Dict]:
+    def predict_batch(self, sequences: List[np.ndarray], normalize: bool = True) -> List[Dict]:
         """Make batch predictions."""
         results = []
         for seq in sequences:

@@ -1,9 +1,6 @@
 import pytest
-from click.testing import CliRunner
 from cli.main import app
 from typer.testing import CliRunner as TyperRunner
-from pathlib import Path
-import shutil
 import os
 
 
@@ -32,6 +29,7 @@ class TestInitCommand:
         """Test that init creates all necessary files."""
         runner = TyperRunner()
         result = runner.invoke(app, ["init", "sentiment", "--name", "test-proj"])
+        assert result.exit_code == 0
 
         project_path = temp_dir / "test-proj"
         assert (project_path / "train.py").exists()

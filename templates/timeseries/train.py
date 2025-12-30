@@ -15,7 +15,7 @@ from pathlib import Path
 from tqdm import tqdm
 import mlflow
 import argparse
-from typing import Tuple, List
+from typing import Tuple
 
 from model import TimeSeriesForecaster
 
@@ -103,9 +103,7 @@ def load_data(config: dict) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     val_data = data[train_end:val_end]
     test_data = data[val_end:]
 
-    print(
-        f"Data splits - Train: {len(train_data)}, Val: {len(val_data)}, Test: {len(test_data)}"
-    )
+    print(f"Data splits - Train: {len(train_data)}, Val: {len(val_data)}, Test: {len(test_data)}")
 
     return train_data, val_data, test_data
 
@@ -304,7 +302,7 @@ def main(config_path: str = "config.yaml", experiment_name: str = None):
             )
             if git_commit.returncode == 0:
                 mlflow.set_tag("git.commit", git_commit.stdout.strip()[:8])
-        except:
+        except Exception:
             pass
 
         # Log model info
@@ -316,7 +314,7 @@ def main(config_path: str = "config.yaml", experiment_name: str = None):
             }
         )
 
-        print(f"\nModel Info:")
+        print("\nModel Info:")
         print(f"  Parameters: {model_info['num_parameters']:,}")
         print(f"  Device: {model_info['device']}")
         print(f"  Sequence Length: {model_info['sequence_length']}")
@@ -377,23 +375,21 @@ def main(config_path: str = "config.yaml", experiment_name: str = None):
             config["forecasting"]["prediction_length"],
             stride=config["forecasting"]["prediction_length"],
         )
-        test_loader = DataLoader(
-            test_dataset, batch_size=config["training"]["batch_size"]
-        )
+        test_loader = DataLoader(test_dataset, batch_size=config["training"]["batch_size"])
 
         test_loss, test_mae = evaluate(model, test_loader, criterion, device)
 
         mlflow.log_metrics({"test_loss": test_loss, "test_mae": test_mae})
 
-        print(f"\nTest Results:")
+        print("\nTest Results:")
         print(f"  Test Loss: {test_loss:.4f}")
         print(f"  Test MAE: {test_mae:.4f}")
 
         # Log model to MLflow
         mlflow.pytorch.log_model(model, "model")
 
-        print(f"\n✓ Training complete! Model saved to best_model/")
-        print(f"  View results: MLflow UI at http://localhost:5000")
+        print("\n✓ Training complete! Model saved to best_model/")
+        print("  View results: MLflow UI at http://localhost:5000")
 
 
 if __name__ == "__main__":
