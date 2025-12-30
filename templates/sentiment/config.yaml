@@ -1,0 +1,37 @@
+# Model Configuration
+model:
+  name: "distilbert-base-uncased"  # HuggingFace model name
+  num_labels: 2  # Binary sentiment classification (positive/negative)
+  max_length: 512  # Maximum sequence length
+
+# Training Configuration
+training:
+  batch_size: 16
+  learning_rate: 0.00002
+  num_epochs: 3
+  warmup_steps: 100
+  weight_decay: 0.01
+  seed: 42
+  gradient_accumulation_steps: 1
+  fp16: false  # Use mixed precision training (requires GPU)
+  
+# Data Configuration
+data:
+  dataset: "imdb"  # HuggingFace dataset name
+  text_column: "text"  # Column containing text
+  label_column: "label"  # Column containing labels
+  train_split: "train[:5000]"  # Use subset for quick testing
+  test_split: "test[:1000]"
+  validation_split: 0.1  # Split from training data
+  
+# MLflow Configuration
+mlflow:
+  experiment_name: "sentiment-analysis"
+  tracking_uri: "http://localhost:5000"  # MLflow tracking server
+  run_name: null  # Auto-generated if null
+  
+# Logging
+logging:
+  log_interval: 100  # Log every N steps
+  eval_interval: 500  # Evaluate every N steps
+  save_interval: 1000  # Save checkpoint every N steps

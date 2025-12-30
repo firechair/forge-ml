@@ -1,0 +1,7 @@
+[core]
+    remote = myremote
+    autostage = true
+#[remote "myremote"]
+#    url = s3://my-bucket/dvc-storage
+#    url = gs://my-bucket/dvc-storage
+#    url = /tmp/dvc-storage

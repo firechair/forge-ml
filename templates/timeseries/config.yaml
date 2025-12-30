@@ -1,0 +1,36 @@
+# Time Series Forecasting Configuration
+
+model:
+  name: "LSTM"  # LSTM, GRU, or Transformer
+  input_size: 1  # Number of features (1 for univariate, >1 for multivariate)
+  hidden_size: 128
+  num_layers: 2
+  dropout: 0.2
+  bidirectional: false
+
+data:
+  dataset: "ETTh1"  # ETTh1, ETTm1, weather, or custom CSV path
+  target_column: "OT"  # Column to predict
+  timestamp_column: "date"  # Timestamp column name
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+
+forecasting:
+  sequence_length: 96  # Input window size (number of past timesteps)
+  prediction_length: 24  # Output window size (number of future timesteps)
+  stride: 1  # Stride for creating sequences
+
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  num_epochs: 50
+  weight_decay: 0.0001
+  grad_clip: 1.0
+  early_stopping_patience: 10
+  seed: 42
+
+mlflow:
+  experiment_name: "time-series-forecasting"
+  run_name: null  # Auto-generated if null
+  tracking_uri: null  # Use default (local mlruns) if null
