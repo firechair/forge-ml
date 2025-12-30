@@ -3,6 +3,7 @@ Pytest fixtures for sentiment analysis tests.
 
 Fixtures provide reusable test data and setup/teardown logic.
 """
+
 import pytest
 import torch
 from pathlib import Path
@@ -28,17 +29,17 @@ def sample_texts():
         "positive": [
             "This movie was absolutely fantastic! I loved every minute of it.",
             "Great product, highly recommend!",
-            "Best experience ever, will definitely come back."
+            "Best experience ever, will definitely come back.",
         ],
         "negative": [
             "Terrible movie, waste of time.",
             "Very disappointed with this product.",
-            "Worst service I've ever experienced."
+            "Worst service I've ever experienced.",
         ],
         "neutral": [
             "The movie was okay, nothing special.",
             "It works as expected.",
-        ]
+        ],
     }
 
 

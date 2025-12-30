@@ -4,6 +4,7 @@ Integration tests for ForgeML.
 Tests the complete workflow from project creation to model serving.
 These tests verify that all components work together correctly.
 """
+
 import pytest
 import subprocess
 import tempfile
@@ -11,6 +12,7 @@ import shutil
 from pathlib import Path
 import time
 import requests
+import sys
 
 
 @pytest.fixture
@@ -34,10 +36,10 @@ def test_init_creates_project(temp_project_dir, forgeml_root):
 
     # Run init command
     result = subprocess.run(
-        ["python", "-m", "cli.main", "init", "sentiment", "--name", project_name],
+        [sys.executable, "-m", "cli.main", "init", "sentiment", "--name", project_name],
         cwd=forgeml_root,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     assert result.returncode == 0, f"Init failed: {result.stderr}"
@@ -67,10 +69,10 @@ def test_init_creates_project(temp_project_dir, forgeml_root):
 def test_init_invalid_template(forgeml_root):
     """Test that init fails gracefully with invalid template."""
     result = subprocess.run(
-        ["python", "-m", "cli.main", "init", "nonexistent", "--name", "test"],
+        [sys.executable, "-m", "cli.main", "init", "nonexistent", "--name", "test"],
         cwd=forgeml_root,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     assert result.returncode == 1
@@ -88,10 +90,10 @@ def test_init_existing_directory(forgeml_root):
 
         # Try to init into existing directory
         result = subprocess.run(
-            ["python", "-m", "cli.main", "init", "sentiment", "--name", project_name],
+            [sys.executable, "-m", "cli.main", "init", "sentiment", "--name", project_name],
             cwd=forgeml_root,
             capture_output=True,
-            text=True
+            text=True,
         )
 
         assert result.returncode == 1
@@ -103,10 +105,6 @@ def test_init_existing_directory(forgeml_root):
 
 
 @pytest.mark.slow
-@pytest.mark.skipif(
-    not shutil.which("python"),
-    reason="Python not available in PATH"
-)
 def test_full_workflow_quick_train(forgeml_root):
     """
     Test full workflow: init → install deps → quick train (1 epoch, small data).
@@ -119,11 +117,11 @@ def test_full_workflow_quick_train(forgeml_root):
     try:
         # 1. Create project
         result = subprocess.run(
-            ["python", "-m", "cli.main", "init", "sentiment", "--name", project_name],
+            [sys.executable, "-m", "cli.main", "init", "sentiment", "--name", project_name],
             cwd=forgeml_root,
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=30,
         )
         assert result.returncode == 0, f"Init failed: {result.stderr}"
 
@@ -133,15 +131,16 @@ def test_full_workflow_quick_train(forgeml_root):
         # 3. Modify config for quick training
         config_path = project_path / "config.yaml"
         import yaml
+
         with open(config_path) as f:
             config = yaml.safe_load(f)
 
         # Set to 1 epoch for quick test
-        config['training']['num_epochs'] = 1
-        config['training']['batch_size'] = 8  # Smaller batch
-        config['data']['max_samples'] = 100  # Limit dataset size
+        config["training"]["num_epochs"] = 1
+        config["training"]["batch_size"] = 8  # Smaller batch
+        config["data"]["max_samples"] = 100  # Limit dataset size
 
-        with open(config_path, 'w') as f:
+        with open(config_path, "w") as f:
             yaml.dump(config, f)
 
         # 4. Verify train.py exists and is valid Python
@@ -150,21 +149,21 @@ def test_full_workflow_quick_train(forgeml_root):
 
         # Try to parse it (syntax check)
         with open(train_script) as f:
-            compile(f.read(), train_script, 'exec')
+            compile(f.read(), train_script, "exec")
 
         # 5. Verify model.py exists and is valid
         model_script = project_path / "model.py"
         assert model_script.exists()
 
         with open(model_script) as f:
-            compile(f.read(), model_script, 'exec')
+            compile(f.read(), model_script, "exec")
 
         # 6. Verify serve.py exists and is valid
         serve_script = project_path / "serve.py"
         assert serve_script.exists()
 
         with open(serve_script) as f:
-            compile(f.read(), serve_script, 'exec')
+            compile(f.read(), serve_script, "exec")
 
         print(f"✅ Full workflow test passed (quick version)")
 
@@ -179,10 +178,10 @@ def test_train_command_validation(forgeml_root):
     with tempfile.TemporaryDirectory() as temp_dir:
         # Try to run train in empty directory
         result = subprocess.run(
-            ["python", "-m", "cli.main", "train"],
+            [sys.executable, "-m", "cli.main", "train"],
             cwd=temp_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
 
         # Should fail because config.yaml doesn't exist
@@ -195,26 +194,28 @@ def test_serve_command_validation(forgeml_root):
     with tempfile.TemporaryDirectory() as temp_dir:
         # Try to run serve in empty directory
         result = subprocess.run(
-            ["python", "-m", "cli.main", "serve"],
+            [sys.executable, "-m", "cli.main", "serve"],
             cwd=temp_dir,
             capture_output=True,
             text=True,
-            timeout=5
+            timeout=5,
         )
 
         # Should fail because serve.py doesn't exist
         assert result.returncode == 1
-        assert "serve.py" in result.stdout.lower() or "not found" in result.stdout.lower()
+        assert (
+            "serve.py" in result.stdout.lower() or "not found" in result.stdout.lower()
+        )
 
 
 def test_cli_help_command(forgeml_root):
     """Test that --help works for all commands."""
     # Main help
     result = subprocess.run(
-        ["python", "-m", "cli.main", "--help"],
+        [sys.executable, "-m", "cli.main", "--help"],
         cwd=forgeml_root,
         capture_output=True,
-        text=True
+        text=True,
     )
     assert result.returncode == 0
     assert "init" in result.stdout
@@ -223,30 +224,30 @@ def test_cli_help_command(forgeml_root):
 
     # Init help
     result = subprocess.run(
-        ["python", "-m", "cli.main", "init", "--help"],
+        [sys.executable, "-m", "cli.main", "init", "--help"],
         cwd=forgeml_root,
         capture_output=True,
-        text=True
+        text=True,
     )
     assert result.returncode == 0
     assert "template" in result.stdout.lower()
 
     # Train help
     result = subprocess.run(
-        ["python", "-m", "cli.main", "train", "--help"],
+        [sys.executable, "-m", "cli.main", "train", "--help"],
         cwd=forgeml_root,
         capture_output=True,
-        text=True
+        text=True,
     )
     assert result.returncode == 0
     assert "config" in result.stdout.lower()
 
     # Serve help
     result = subprocess.run(
-        ["python", "-m", "cli.main", "serve", "--help"],
+        [sys.executable, "-m", "cli.main", "serve", "--help"],
         cwd=forgeml_root,
         capture_output=True,
-        text=True
+        text=True,
     )
     assert result.returncode == 0
     assert "port" in result.stdout.lower()
@@ -271,7 +272,7 @@ def test_template_files_are_valid_python(forgeml_root):
 
             with open(py_file) as f:
                 try:
-                    compile(f.read(), py_file, 'exec')
+                    compile(f.read(), py_file, "exec")
                 except SyntaxError as e:
                     pytest.fail(f"Syntax error in {py_file}: {e}")
 
@@ -290,11 +291,19 @@ def test_template_requirements_are_valid(forgeml_root):
 
         # Check that file is not empty
         content = req_file.read_text()
-        assert len(content.strip()) > 0, f"Empty requirements.txt in {template_dir.name}"
+        assert (
+            len(content.strip()) > 0
+        ), f"Empty requirements.txt in {template_dir.name}"
 
         # Check for basic package format (very basic validation)
-        lines = [l.strip() for l in content.split('\n') if l.strip() and not l.startswith('#')]
-        assert len(lines) > 0, f"No packages in requirements.txt for {template_dir.name}"
+        lines = [
+            l.strip()
+            for l in content.split("\n")
+            if l.strip() and not l.startswith("#")
+        ]
+        assert (
+            len(lines) > 0
+        ), f"No packages in requirements.txt for {template_dir.name}"
 
 
 def test_template_config_is_valid_yaml(forgeml_root):
@@ -328,20 +337,27 @@ def test_mlflow_uri_loading(forgeml_root):
     try:
         # Create project
         subprocess.run(
-            ["python", "-m", "cli.main", "init", "sentiment", "--name", project_name],
+            [sys.executable, "-m", "cli.main", "init", "sentiment", "--name", project_name],
             cwd=forgeml_root,
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )
 
         # Try to serve with invalid URI (should fail gracefully)
         result = subprocess.run(
-            ["python", "-m", "cli.main", "serve", "--model-uri", "runs:/invalid123/model"],
+            [
+                sys.executable,
+                "-m",
+                "cli.main",
+                "serve",
+                "--model-uri",
+                "runs:/invalid123/model",
+            ],
             cwd=project_path,
             capture_output=True,
             text=True,
-            timeout=10
+            timeout=10,
         )
 
         # Should fail because run doesn't exist, but shouldn't crash

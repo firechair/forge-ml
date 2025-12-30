@@ -3,6 +3,7 @@ Tests for the FastAPI serving application.
 
 Tests API endpoints, request/response handling, and error cases.
 """
+
 import pytest
 from fastapi.testclient import TestClient
 from pathlib import Path
@@ -14,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 # These tests will only run if a trained model exists
 pytestmark = pytest.mark.skipif(
     not (Path(__file__).parent.parent / "best_model").exists(),
-    reason="No trained model found (best_model/ directory missing)"
+    reason="No trained model found (best_model/ directory missing)",
 )
 
 
@@ -22,6 +23,7 @@ pytestmark = pytest.mark.skipif(
 def client():
     """Create a test client for the FastAPI app."""
     from serve import app
+
     return TestClient(app)
 
 
@@ -41,7 +43,7 @@ def test_health_endpoint(client):
 def test_predict_endpoint_single(client, sample_texts):
     """Test the /predict endpoint with a single text."""
     # Test positive sentiment
-    payload = {"text": sample_texts['positive'][0]}
+    payload = {"text": sample_texts["positive"][0]}
     response = client.post("/predict", json=payload)
 
     assert response.status_code == 200
@@ -53,7 +55,7 @@ def test_predict_endpoint_single(client, sample_texts):
     assert "probabilities" in data
     assert "prediction_time_ms" in data
 
-    assert data["text"] == sample_texts['positive'][0]
+    assert data["text"] == sample_texts["positive"][0]
     assert isinstance(data["label"], int)
     assert isinstance(data["confidence"], float)
     assert 0 <= data["confidence"] <= 1
@@ -63,7 +65,7 @@ def test_predict_endpoint_single(client, sample_texts):
 
 def test_predict_endpoint_negative_sentiment(client, sample_texts):
     """Test prediction on negative sentiment text."""
-    payload = {"text": sample_texts['negative'][0]}
+    payload = {"text": sample_texts["negative"][0]}
     response = client.post("/predict", json=payload)
 
     assert response.status_code == 200
@@ -102,7 +104,7 @@ def test_predict_endpoint_invalid_type(client):
 
 def test_batch_predict_endpoint(client, sample_texts):
     """Test the /batch_predict endpoint."""
-    texts = sample_texts['positive'][:2] + sample_texts['negative'][:2]
+    texts = sample_texts["positive"][:2] + sample_texts["negative"][:2]
     payload = {"texts": texts}
     response = client.post("/batch_predict", json=payload)
 
@@ -196,7 +198,7 @@ def test_concurrent_requests(client, sample_texts):
     import concurrent.futures
 
     def make_request():
-        payload = {"text": sample_texts['positive'][0]}
+        payload = {"text": sample_texts["positive"][0]}
         return client.post("/predict", json=payload)
 
     # Make 10 concurrent requests

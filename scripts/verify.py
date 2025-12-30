@@ -3,6 +3,7 @@ ForgeML Installation Verification Script
 
 Checks that all components are properly installed and working.
 """
+
 import sys
 import subprocess
 from pathlib import Path
@@ -38,9 +39,7 @@ def check_imports():
 def check_cli():
     """Check mlfactory CLI is available."""
     result = subprocess.run(
-        [sys.executable, "-m", "cli.main", "--help"],
-        capture_output=True,
-        text=True
+        [sys.executable, "-m", "cli.main", "--help"], capture_output=True, text=True
     )
     if result.returncode != 0:
         raise RuntimeError("CLI not working")
@@ -63,10 +62,7 @@ def check_docker():
     """Check if Docker is running (optional)."""
     try:
         result = subprocess.run(
-            ["docker", "ps"],
-            capture_output=True,
-            text=True,
-            timeout=5
+            ["docker", "ps"], capture_output=True, text=True, timeout=5
         )
         if result.returncode == 0:
             return True

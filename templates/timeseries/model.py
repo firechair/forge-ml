@@ -4,6 +4,7 @@ Time Series Forecasting Model
 LSTM-based model for univariate and multivariate time series forecasting.
 Supports rolling window predictions and batch inference.
 """
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -22,7 +23,7 @@ class TimeSeriesLSTM(nn.Module):
         num_layers: int = 2,
         dropout: float = 0.2,
         bidirectional: bool = False,
-        prediction_length: int = 24
+        prediction_length: int = 24,
     ):
         super().__init__()
 
@@ -39,7 +40,7 @@ class TimeSeriesLSTM(nn.Module):
             num_layers=num_layers,
             dropout=dropout if num_layers > 1 else 0,
             bidirectional=bidirectional,
-            batch_first=True
+            batch_first=True,
         )
 
         # Output layer
@@ -52,11 +53,11 @@ class TimeSeriesLSTM(nn.Module):
     def _init_weights(self):
         """Initialize model weights."""
         for name, param in self.lstm.named_parameters():
-            if 'weight_ih' in name:
+            if "weight_ih" in name:
                 nn.init.xavier_uniform_(param.data)
-            elif 'weight_hh' in name:
+            elif "weight_hh" in name:
                 nn.init.orthogonal_(param.data)
-            elif 'bias' in name:
+            elif "bias" in name:
                 param.data.fill_(0)
 
         nn.init.xavier_uniform_(self.fc.weight)
@@ -83,7 +84,9 @@ class TimeSeriesLSTM(nn.Module):
 
         # Reshape to (batch_size, prediction_length, input_size)
         batch_size = x.size(0)
-        predictions = predictions.view(batch_size, self.prediction_length, self.input_size)
+        predictions = predictions.view(
+            batch_size, self.prediction_length, self.input_size
+        )
 
         return predictions
 
@@ -99,7 +102,7 @@ class TimeSeriesForecaster:
         dropout: float = 0.2,
         bidirectional: bool = False,
         sequence_length: int = 96,
-        prediction_length: int = 24
+        prediction_length: int = 24,
     ):
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -117,7 +120,7 @@ class TimeSeriesForecaster:
             num_layers=num_layers,
             dropout=dropout,
             bidirectional=bidirectional,
-            prediction_length=prediction_length
+            prediction_length=prediction_length,
         ).to(self.device)
 
         # Normalization parameters (fitted during training)
@@ -127,17 +130,19 @@ class TimeSeriesForecaster:
     def get_model_info(self) -> Dict:
         """Get model information."""
         num_params = sum(p.numel() for p in self.model.parameters())
-        trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+        trainable_params = sum(
+            p.numel() for p in self.model.parameters() if p.requires_grad
+        )
 
         return {
-            'input_size': self.input_size,
-            'hidden_size': self.hidden_size,
-            'num_layers': self.num_layers,
-            'sequence_length': self.sequence_length,
-            'prediction_length': self.prediction_length,
-            'num_parameters': num_params,
-            'trainable_parameters': trainable_params,
-            'device': str(self.device)
+            "input_size": self.input_size,
+            "hidden_size": self.hidden_size,
+            "num_layers": self.num_layers,
+            "sequence_length": self.sequence_length,
+            "prediction_length": self.prediction_length,
+            "num_parameters": num_params,
+            "trainable_parameters": trainable_params,
+            "device": str(self.device),
         }
 
     def fit_scaler(self, data: np.ndarray):
@@ -191,11 +196,13 @@ class TimeSeriesForecaster:
             predictions_np = self.denormalize(predictions_np)
 
         return {
-            'predictions': predictions_np.tolist(),
-            'input_sequence': sequence.tolist()
+            "predictions": predictions_np.tolist(),
+            "input_sequence": sequence.tolist(),
         }
 
-    def predict_batch(self, sequences: List[np.ndarray], normalize: bool = True) -> List[Dict]:
+    def predict_batch(
+        self, sequences: List[np.ndarray], normalize: bool = True
+    ) -> List[Dict]:
         """Make batch predictions."""
         results = []
         for seq in sequences:
@@ -213,22 +220,22 @@ class TimeSeriesForecaster:
 
         # Save config
         config = {
-            'input_size': self.input_size,
-            'hidden_size': self.hidden_size,
-            'num_layers': self.num_layers,
-            'dropout': self.dropout,
-            'bidirectional': self.bidirectional,
-            'sequence_length': self.sequence_length,
-            'prediction_length': self.prediction_length,
-            'mean': self.mean.tolist() if self.mean is not None else None,
-            'std': self.std.tolist() if self.std is not None else None
+            "input_size": self.input_size,
+            "hidden_size": self.hidden_size,
+            "num_layers": self.num_layers,
+            "dropout": self.dropout,
+            "bidirectional": self.bidirectional,
+            "sequence_length": self.sequence_length,
+            "prediction_length": self.prediction_length,
+            "mean": self.mean.tolist() if self.mean is not None else None,
+            "std": self.std.tolist() if self.std is not None else None,
         }
 
-        with open(path / "config.json", 'w') as f:
+        with open(path / "config.json", "w") as f:
             json.dump(config, f, indent=2)
 
     @classmethod
-    def load(cls, path: Path) -> 'TimeSeriesForecaster':
+    def load(cls, path: Path) -> "TimeSeriesForecaster":
         """Load model from path."""
         path = Path(path)
 
@@ -238,13 +245,13 @@ class TimeSeriesForecaster:
 
         # Create instance
         forecaster = cls(
-            input_size=config['input_size'],
-            hidden_size=config['hidden_size'],
-            num_layers=config['num_layers'],
-            dropout=config['dropout'],
-            bidirectional=config['bidirectional'],
-            sequence_length=config['sequence_length'],
-            prediction_length=config['prediction_length']
+            input_size=config["input_size"],
+            hidden_size=config["hidden_size"],
+            num_layers=config["num_layers"],
+            dropout=config["dropout"],
+            bidirectional=config["bidirectional"],
+            sequence_length=config["sequence_length"],
+            prediction_length=config["prediction_length"],
         )
 
         # Load weights
@@ -253,8 +260,8 @@ class TimeSeriesForecaster:
         )
 
         # Load normalization parameters
-        if config['mean'] is not None:
-            forecaster.mean = np.array(config['mean'])
-            forecaster.std = np.array(config['std'])
+        if config["mean"] is not None:
+            forecaster.mean = np.array(config["mean"])
+            forecaster.std = np.array(config["std"])
 
         return forecaster

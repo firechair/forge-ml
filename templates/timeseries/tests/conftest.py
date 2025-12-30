@@ -1,4 +1,5 @@
 """Pytest fixtures for time series tests."""
+
 import pytest
 import numpy as np
 import torch
@@ -20,8 +21,8 @@ def config():
 @pytest.fixture
 def sample_sequence(config):
     """Generate sample time series sequence."""
-    seq_len = config['forecasting']['sequence_length']
-    input_size = config['model']['input_size']
+    seq_len = config["forecasting"]["sequence_length"]
+    input_size = config["model"]["input_size"]
     return np.random.randn(seq_len, input_size).astype(np.float32)
 
 

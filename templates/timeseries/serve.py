@@ -3,6 +3,7 @@ Time Series Forecasting API Server
 
 FastAPI server for serving time series forecasting predictions.
 """
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import List
@@ -16,13 +17,15 @@ from model import TimeSeriesForecaster
 app = FastAPI(
     title="Time Series Forecasting API",
     description="LSTM-based time series forecasting service",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Load model
 MODEL_PATH = Path("best_model")
 if not MODEL_PATH.exists():
-    raise RuntimeError(f"Model not found at {MODEL_PATH}. Train a model first with: python train.py")
+    raise RuntimeError(
+        f"Model not found at {MODEL_PATH}. Train a model first with: python train.py"
+    )
 
 print(f"Loading model from {MODEL_PATH}...")
 forecaster = TimeSeriesForecaster.load(MODEL_PATH)
@@ -36,18 +39,19 @@ print(f"  Prediction length: {model_info['prediction_length']}")
 # Request/Response models
 class ForecastRequest(BaseModel):
     """Request model for single forecast."""
+
     sequence: List[List[float]] = Field(
         ...,
-        description=f"Input sequence of shape ({model_info['sequence_length']}, {model_info['input_size']})"
+        description=f"Input sequence of shape ({model_info['sequence_length']}, {model_info['input_size']})",
     )
     normalize: bool = Field(
-        default=True,
-        description="Whether to normalize input (recommended: True)"
+        default=True, description="Whether to normalize input (recommended: True)"
     )
 
 
 class ForecastResponse(BaseModel):
     """Response model for forecast."""
+
     predictions: List[List[float]]
     input_sequence: List[List[float]]
     sequence_length: int
@@ -57,22 +61,23 @@ class ForecastResponse(BaseModel):
 
 class BatchForecastRequest(BaseModel):
     """Request model for batch forecasting."""
+
     sequences: List[List[List[float]]] = Field(
-        ...,
-        description="List of input sequences",
-        max_length=100
+        ..., description="List of input sequences", max_length=100
     )
     normalize: bool = Field(default=True)
 
 
 class BatchForecastResponse(BaseModel):
     """Response model for batch forecasting."""
+
     predictions: List[ForecastResponse]
     total_prediction_time_ms: float
 
 
 class HealthResponse(BaseModel):
     """Health check response."""
+
     status: str
     model_loaded: bool
     model_info: dict
@@ -88,19 +93,15 @@ async def root():
             "/health": "Health check",
             "/forecast": "Single sequence forecast",
             "/forecast/batch": "Batch forecasting",
-            "/docs": "API documentation"
-        }
+            "/docs": "API documentation",
+        },
     }
 
 
 @app.get("/health", response_model=HealthResponse)
 async def health():
     """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "model_loaded": True,
-        "model_info": model_info
-    }
+    return {"status": "healthy", "model_loaded": True, "model_info": model_info}
 
 
 @app.post("/forecast", response_model=ForecastResponse)
@@ -118,7 +119,7 @@ async def forecast(request: ForecastRequest):
         if sequence.shape != expected_shape:
             raise HTTPException(
                 status_code=400,
-                detail=f"Invalid sequence shape. Expected {expected_shape}, got {sequence.shape}"
+                detail=f"Invalid sequence shape. Expected {expected_shape}, got {sequence.shape}",
             )
 
         # Make prediction
@@ -127,11 +128,11 @@ async def forecast(request: ForecastRequest):
         prediction_time = (time.time() - start_time) * 1000
 
         return {
-            "predictions": result['predictions'],
-            "input_sequence": result['input_sequence'],
+            "predictions": result["predictions"],
+            "input_sequence": result["input_sequence"],
             "sequence_length": forecaster.sequence_length,
             "prediction_length": forecaster.prediction_length,
-            "prediction_time_ms": prediction_time
+            "prediction_time_ms": prediction_time,
         }
 
     except Exception as e:
@@ -151,7 +152,7 @@ async def forecast_batch(request: BatchForecastRequest):
     if len(request.sequences) > 100:
         raise HTTPException(
             status_code=400,
-            detail=f"Too many sequences. Maximum 100, got {len(request.sequences)}"
+            detail=f"Too many sequences. Maximum 100, got {len(request.sequences)}",
         )
 
     try:
@@ -164,7 +165,7 @@ async def forecast_batch(request: BatchForecastRequest):
             if seq.shape != expected_shape:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid shape for sequence {i}. Expected {expected_shape}, got {seq.shape}"
+                    detail=f"Invalid shape for sequence {i}. Expected {expected_shape}, got {seq.shape}",
                 )
 
         # Make predictions
@@ -175,25 +176,27 @@ async def forecast_batch(request: BatchForecastRequest):
         # Format responses
         predictions = []
         for result in results:
-            predictions.append({
-                "predictions": result['predictions'],
-                "input_sequence": result['input_sequence'],
-                "sequence_length": forecaster.sequence_length,
-                "prediction_length": forecaster.prediction_length,
-                "prediction_time_ms": total_time / len(sequences)
-            })
+            predictions.append(
+                {
+                    "predictions": result["predictions"],
+                    "input_sequence": result["input_sequence"],
+                    "sequence_length": forecaster.sequence_length,
+                    "prediction_length": forecaster.prediction_length,
+                    "prediction_time_ms": total_time / len(sequences),
+                }
+            )
 
-        return {
-            "predictions": predictions,
-            "total_prediction_time_ms": total_time
-        }
+        return {"predictions": predictions, "total_prediction_time_ms": total_time}
 
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Batch prediction failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Batch prediction failed: {str(e)}"
+        )
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
