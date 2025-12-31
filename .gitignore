@@ -40,6 +40,7 @@ mlartifacts/
 # OS
 .DS_Store
 Thumbs.db
+.claude/
 
 # Database
 *.db
